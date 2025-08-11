@@ -61,6 +61,7 @@ namespace ShipItApp
                     case "2": ShowProfile();  break;
                     case "3": ShowAllUsers(); break;
                     case "4": _currentUser = null; break;
+                    case "5": SearchUsers(); break;
                     case "0": Environment.Exit(0); break;
                 }
             }
@@ -256,3 +257,4 @@ namespace ShipItApp
         }
     }
 }
+
