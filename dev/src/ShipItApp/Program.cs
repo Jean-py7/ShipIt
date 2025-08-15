@@ -54,17 +54,18 @@ namespace ShipItApp
                 }
             }
             else
-            {
-                switch (choice)
-                {
-                    case "1": ShowAbout();         break;
-                    case "2": ShowProfile();       break;
-                    case "3": ShowAllUsers();      break;
-                    case "4": _currentUser = null; break;
-                    case "5": Menu.SearchUsers();  break;
-                    case "0": Environment.Exit(0); break;
-                }
-            }
+{
+    switch (choice)
+    {
+        case "1": ShowAbout();         break;
+        case "2": ShowProfile();       break;
+        case "3": ShowAllUsers();      break;
+        case "4": _currentUser = null; break;
+        case "5": Menu.SearchUsers();  break;  
+        case "0": Environment.Exit(0); break;
+    }
+}
+
         }
 
         private static void CreateUser()
@@ -257,5 +258,6 @@ namespace ShipItApp
         }
     }
 }
+
 
 
