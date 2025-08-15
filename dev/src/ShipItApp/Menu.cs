@@ -47,7 +47,6 @@ namespace ShipItApp
             Console.ResetColor();
         }
     }
-}
 
 public static void SearchUsers()
 {
