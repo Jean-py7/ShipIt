@@ -47,9 +47,9 @@ namespace ShipItApp
             {
                 switch (choice)
                 {
-                    case "1": CreateUser(); break;
-                    case "2": Login();      break;
-                    case "3": ShowAbout();  break;
+                    case "1": CreateUser();        break;
+                    case "2": Login();             break;
+                    case "3": ShowAbout();         break;
                     case "0": Environment.Exit(0); break;
                 }
             }
@@ -57,11 +57,11 @@ namespace ShipItApp
             {
                 switch (choice)
                 {
-                    case "1": ShowAbout();    break;
-                    case "2": ShowProfile();  break;
-                    case "3": ShowAllUsers(); break;
+                    case "1": ShowAbout();         break;
+                    case "2": ShowProfile();       break;
+                    case "3": ShowAllUsers();      break;
                     case "4": _currentUser = null; break;
-                    case "5": SearchUsers(); break;
+                    case "5": Menu.SearchUsers();  break;
                     case "0": Environment.Exit(0); break;
                 }
             }
@@ -257,4 +257,5 @@ namespace ShipItApp
         }
     }
 }
+
 
