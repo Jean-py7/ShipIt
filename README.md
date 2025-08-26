@@ -12,7 +12,7 @@
 - **Validation**  
   - `ValidateStateAbbreviation` ensures proper two‑letter state codes.  
   - `ValidateEmail` ensures proper email format.  
-  - `ValidatePassword` ensures a minimum of 6 characters.  
+  - `ValidatePassword` ensures a minimum of 8 characters.  
 - **Console Formatting**  0
   Colored headers, menu items, prompts, and feedback for clarity.
 
@@ -34,6 +34,11 @@
 - Input trimming and safer console output (no plain passwords)
 - Polished CLI flow (clear menus, Back/Exit)
 - Screenshots/GIF for quick review
+
+Screenshots:
+https://github.com/Jean-py7/ShipIt/blob/stage/ShipIt-csv-Test.png
+https://github.com/Jean-py7/ShipIt/blob/stage/ShipIt-Test.png
+
 
 ### Build & Run (.NET 8)
 ```bash.
