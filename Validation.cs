@@ -1,45 +1,34 @@
 using System;
-using System.Linq;
-using System.Net.Mail;
+using System.Text.RegularExpressions;
 
-namespace ShipItApp
+public static class Validation
 {
-    public static class Validation
+    private static readonly Regex Letters = new("[A-Za-z]");
+    private static readonly Regex Digits  = new(@"\d");
+
+    public static bool TryValidatePassword(string? input, out string error)
     {
-        /// <summary>
-        /// Checks if the provided state abbreviation is valid (two alphabetic characters).
-        /// </summary>
-        public static bool ValidateStateAbbreviation(string state)
-        {
-            return !string.IsNullOrWhiteSpace(state)
-                   && state.Trim().Length == 2
-                   && state.Trim().All(char.IsLetter);
-        }
+        input = (input ?? string.Empty).Trim();
 
-        /// <summary>
-        /// Validates email format using System.Net.Mail.MailAddress.
-        /// </summary>
-        public static bool ValidateEmail(string email)
+        if (input.Length < 8)
         {
-            if (string.IsNullOrWhiteSpace(email)) return false;
-            try
-            {
-                var addr = new MailAddress(email.Trim());
-                return addr.Address == email.Trim();
-            }
-            catch
-            {
-                return false;
-            }
+            error = "Password must be at least 8 characters.";
+            return false;
         }
-
-        /// <summary>
-        /// Ensures password is at least 6 characters long.
-        /// </summary>
-        public static bool ValidatePassword(string password)
+        if (!Letters.IsMatch(input))
         {
-            return !string.IsNullOrWhiteSpace(password)
-                   && password.Length >= 6;
+            error = "Password must include at least one letter (A–Z).";
+            return false;
         }
+        if (!Digits.IsMatch(input))
+        {
+            error = "Password must include at least one digit (0–9).";
+            return false;
+        }
+        error = string.Empty;
+        return true;
     }
+
+    public static string ReadTrimmed() => (Console.ReadLine() ?? string.Empty).Trim();
 }
+
