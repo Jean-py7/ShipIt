@@ -27,3 +27,15 @@
 2. 'Added password validations'
 
    ****Important: The application was built in .NET 8.0.****
+## Final Milestone (M8)
+
+### What changed
+- Stronger password validation and friendly messages
+- Input trimming and safer console output (no plain passwords)
+- Polished CLI flow (clear menus, Back/Exit)
+- Screenshots/GIF for quick review
+
+### Build & Run (.NET 8)
+```bash
+dotnet build
+dotnet run
