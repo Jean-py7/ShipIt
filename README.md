@@ -1,20 +1,16 @@
 # ShipItApp
 
 ## Features
-- **Email Support**  
-  Prompts for, validates, stores, and displays email for each user.  
-- **Password Support**  
-  Prompts for a password on creation, validates minimum length, stores it (in CSV), and requires it at login.  
-- **Users Menu**  
-  “Users” option in the signed‑in menu reads and lists all users (excluding passwords) from `users.csv`.  
-- **Refactoring**  
-  Menu logic extracted into `Menu.cs`.  
-- **Validation**  
-  - `ValidateStateAbbreviation` ensures proper two‑letter state codes.  
-  - `ValidateEmail` ensures proper email format.  
-  - `ValidatePassword` ensures a minimum of 6 characters.  
-- **Console Formatting**  0
-  Colored headers, menu items, prompts, and feedback for clarity.
+- **Email Support** — prompt, validate, and store email for each user
+- **Password Security (M8)** — salted hashing (`salt:hash`) in `users.csv` (no plain passwords)
+- **Validation (M8)** — password must be **≥ 8 characters** and include **at least one letter and one digit**
+- **Users Menu** — list users with passwords hidden
+- **Console UX** — colored headers, prompts, and friendly messages
+
+## How to Run (.NET 8)
+```bash
+dotnet run -p ShipItApp.csproj
+
 
 ## Usage
 1. 'cd (Your project path)dev/src/ShipItApp'
