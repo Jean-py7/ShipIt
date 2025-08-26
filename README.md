@@ -36,6 +36,6 @@
 - Screenshots/GIF for quick review
 
 ### Build & Run (.NET 8)
-```bash
+```bash.
 dotnet build
 dotnet run
