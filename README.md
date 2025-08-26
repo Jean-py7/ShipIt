@@ -6,7 +6,7 @@
 - **Validation (M8)** — password must be **≥ 8 characters** and include **at least one letter and one digit**
 - **Users Menu** — list users with passwords hidden
 - **Console UX** — colored headers, prompts, and friendly messages
-
+M8 PR: https://github.com/Jean-py7/ShipIt/pull/16
 ## How to Run (.NET 8)
 ```bash
 dotnet run -p ShipItApp.csproj
