@@ -1,213 +1,133 @@
-using System;
-using System.IO;
+public static List<User> LoadUsers() =>
+    File.ReadAllLines(DataFilePath)
+        .Select(line => line.Split(','))
+        .Where(parts => parts.Length >= 5)
+        .Select(parts => new User
+        {
+            Name     = parts[0],
+            Email    = parts[1],
+            Password = parts[2],
+            City     = parts[3],
+            State    = parts[4]
+        })
+        .ToList();
 
-namespace ShipItApp
+public static bool EmailTaken(string email) =>
+    LoadUsers().Any(u => u.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
+
+public static User FindByEmail(string email) =>
+    LoadUsers().FirstOrDefault(u => u.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
+
+private static void CreateUser()
 {
-    public static class Menu
+    Console.Clear();
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.WriteLine("=== Create New User ===");
+    Console.ResetColor();
+
+    // Name
+    Console.Write("Enter your name: ");
+    var name = Console.ReadLine().Trim();
+    while (string.IsNullOrWhiteSpace(name))
     {
-        // ===== Logged-out menu (entry point) =====
-        public static void DisplayLoggedOutMenu()
+        Console.Write("Name cannot be empty. Enter your name: ");
+        name = Console.ReadLine().Trim();
+    }
+
+    // Email
+    Console.Write("Enter your email: ");
+    var email = Console.ReadLine().Trim();
+    while (!Validation.ValidateEmail(email) || EmailTaken(email))
+    {
+        if (EmailTaken(email))
         {
-            while (true)
-            {
-                Console.ForegroundColor = ConsoleColor.Cyan;
-                Console.WriteLine("================================");
-                Console.WriteLine("            MAIN MENU           ");
-                Console.WriteLine("================================");
-                Console.ResetColor();
-
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine();
-                Console.WriteLine(" [1] Create User");
-                Console.WriteLine(" [2] Login");
-                Console.WriteLine(" [3] List Users");
-                Console.WriteLine(" [4] About");
-                Console.WriteLine(" [0] Exit");
-                Console.WriteLine();
-                Console.ResetColor();
-
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.Write(" Select a Menu Option: ");
-                Console.ResetColor();
-                var choice = (Console.ReadLine() ?? string.Empty).Trim();
-
-                switch (choice)
-                {
-                    case "1": CreateUser(); break;
-                    case "2": Login(); break;
-                    case "3": ListUsers(); break;
-                    case "4": About(); break;
-                    case "0": return;
-                    default:
-                        Console.WriteLine("Invalid option. Please try 0–4.");
-                        Pause();
-                        break;
-                }
-            }
+            Console.Write("This email is already registered. Enter a different email: ");
         }
-
-        // ===== Optional: logged-in menu (light demo) =====
-        public static void DisplayLoggedInMenu(User currentUser)
+        else
         {
-            while (true)
-            {
-                Console.ForegroundColor = ConsoleColor.Cyan;
-                Console.WriteLine("================================");
-                Console.WriteLine($"    Welcome, {currentUser?.Name ?? "User"}   ");
-                Console.WriteLine("================================");
-                Console.ResetColor();
-
-                Console.WriteLine();
-                Console.WriteLine(" [1] List Users");
-                Console.WriteLine(" [0] Logout");
-                Console.WriteLine();
-
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.Write(" Select a Menu Option: ");
-                Console.ResetColor();
-                var choice = (Console.ReadLine() ?? string.Empty).Trim();
-
-                switch (choice)
-                {
-                    case "1": ListUsers(); break;
-                    case "0": return;
-                    default:
-                        Console.WriteLine("Invalid option. Please try 0 or 1.");
-                        Pause();
-                        break;
-                }
-            }
+            Console.Write("Invalid email format. Enter a valid email: ");
         }
+        email = Console.ReadLine().Trim();
+    }
 
-        // Create User (validate + hash + save)
-        private static void CreateUser()
+    // Password
+    Console.Write("Enter your password (min 6 chars, at least 1 letter and 1 digit): ");
+    var password = Console.ReadLine();
+    while (!Validation.ValidatePassword(password))
+    {
+        Console.Write("Password too short or lacks required characters. Enter a valid password: ");
+        password = Console.ReadLine();
+    }
+
+    // City
+    Console.Write("Enter your city: ");
+    var city = Console.ReadLine().Trim();
+    while (string.IsNullOrWhiteSpace(city))
+    {
+        Console.Write("City cannot be empty. Enter your city: ");
+        city = Console.ReadLine().Trim();
+    }
+
+    // State
+    Console.Write("Enter your state (2-letter code): ");
+    var state = Console.ReadLine().Trim();
+    while (!Validation.ValidateStateAbbreviation(state))
+    {
+        Console.Write("Invalid state. Enter a valid 2-letter state code: ");
+        state = Console.ReadLine().Trim();
+    }
+
+    var user = new User
+    {
+        Name     = name,
+        Email    = email,
+        Password = password,
+        City     = city,
+        State    = state.ToUpper()
+    };
+    File.AppendAllLines(DataFilePath, new[] { $"{user.Name},{user.Email},{user.Password},{user.City},{user.State}" });
+
+    Console.ForegroundColor = ConsoleColor.Green;
+    Console.WriteLine("User created successfully.");
+    Console.ResetColor();
+    Console.WriteLine("Press any key to continue...");
+    Console.ReadKey();
+}
+
+private static void Login()
+{
+    Console.Clear();
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.WriteLine("=== Login ===");
+    Console.ResetColor();
+
+    Console.Write("Enter your email: ");
+    var emailInput = Console.ReadLine().Trim();
+    var found = FindByEmail(emailInput);
+
+    if (found != null)
+    {
+        Console.Write("Enter your password: ");
+        var passwordInput = Console.ReadLine();
+        if (found.Password == passwordInput)
         {
-            Console.Write("Name: ");  var name  = Validation.ReadTrimmed();
-            Console.Write("Email: "); var email = Validation.ReadTrimmed();
-            Console.Write("City: ");  var city  = Validation.ReadTrimmed();
-            Console.Write("State: "); var state = Validation.ReadTrimmed();
-
-            Console.Write("Password: ");
-            var pwd = Validation.ReadTrimmed();
-            while (!Validation.TryValidatePassword(pwd, out var msg))
-            {
-                Console.WriteLine(msg);
-                Console.Write("Password: ");
-                pwd = Validation.ReadTrimmed();
-            }
-
-            // 🔒 hash it (salt:hash)
-            var pwdHash = PasswordHasher.CreateHash(pwd);
-
-            // Save as: Name,Email,PasswordHash,City,State
-            var line = $"{name},{email},{pwdHash},{city},{state}";
-            try
-            {
-                File.AppendAllText("users.csv", line + Environment.NewLine);
-                Console.WriteLine("User saved.");
-            }
-            catch (IOException ex)
-            {
-                Console.WriteLine($"Could not save user (is users.csv open?): {ex.Message}");
-            }
-            Pause();
+            _currentUser = found;
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"Login successful. Welcome, {_currentUser.Name}!");
         }
-
-        // Login (verify against stored hash
-        private static void Login()
+        else
         {
-            Console.Write("Email: ");    var emailInput = Validation.ReadTrimmed();
-            Console.Write("Password: "); var pwdInput   = Validation.ReadTrimmed();
-
-            if (!File.Exists("users.csv"))
-            {
-                Console.WriteLine("No users have been created yet.");
-                Pause(); return;
-            }
-
-            User? logged = null;
-            try
-            {
-                foreach (var line in File.ReadLines("users.csv"))
-                {
-                    var cols = line.Split(',');
-                    if (cols.Length < 5) continue;
-
-                    var name  = cols[0];
-                    var email = cols[1];
-                    var hash  = cols[2]; // salt:hash
-
-                    if (email.Equals(emailInput, StringComparison.OrdinalIgnoreCase) &&
-                        PasswordHasher.Verify(pwdInput, hash))
-                    {
-                        logged = new User { Name = name, Email = email, City = cols[3], State = cols[4] };
-                        break;
-                    }
-                }
-            }
-            catch (IOException ex)
-            {
-                Console.WriteLine($"Could not read users: {ex.Message}");
-                Pause(); return;
-            }
-
-            if (logged is not null)
-            {
-                Console.WriteLine("Login successful.");
-                Pause();
-                DisplayLoggedInMenu(logged);
-            }
-            else
-            {
-                Console.WriteLine("Invalid email or password.");
-                Pause();
-            }
-        }
-
-        // ===== List Users (hide password/hash) =====
-        private static void ListUsers()
-        {
-            try
-            {
-                if (!File.Exists("users.csv"))
-                {
-                    Console.WriteLine("No users yet.");
-                    Pause();
-                    return;
-                }
-
-                Console.WriteLine("Name | Email | (password hidden)");
-                foreach (var line in File.ReadLines("users.csv"))
-                {
-                    var cols = line.Split(',');
-                    if (cols.Length < 5) continue;
-                    var name  = cols[0];
-                    var email = cols[1];
-                    Console.WriteLine($"{name} | {email} | (password hidden)");
-                }
-            }
-            catch (IOException ex)
-            {
-                Console.WriteLine($"Could not read users: {ex.Message}");
-            }
-            Pause();
-        }
-
-        private static void About()
-        {
-            Console.WriteLine("ShipItApp – Final Milestone demo.");
-            Console.WriteLine("- Passwords validated (>=8 chars, letter + digit)");
-            Console.WriteLine("- Stored as salted hashes (salt:hash) in users.csv");
-            Console.WriteLine("- User list hides passwords");
-            Pause();
-        }
-
-        private static void Pause()
-        {
-            Console.ForegroundColor = ConsoleColor.DarkGray;
-            Console.Write("Press Enter to continue...");
-            Console.ResetColor();
-            Console.ReadLine();
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("Invalid password.");
         }
     }
+    else
+    {
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine("User not found. Please create an account first.");
+    }
+
+    Console.ResetColor();
+    Console.WriteLine("Press any key to continue...");
+    Console.ReadKey();
 }
